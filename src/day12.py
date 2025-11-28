@@ -40,8 +40,7 @@ def process_data(data: list[str], part_1: bool) -> list[str]:
         this_letter = data[i][j]
 
         are_we_there_yet = (
-            this_letter == "E" if part_1
-            else this_letter == "S" or this_letter == "a"
+            this_letter == "E" if part_1 else this_letter == "S" or this_letter == "a"
         )
 
         if are_we_there_yet:
@@ -51,8 +50,13 @@ def process_data(data: list[str], part_1: bool) -> list[str]:
         explored[here] = route_to_here
         this_altitude = get_altitude(this_letter)
 
-        for neighbour in [(i, j+1), (i, j-1), (i+1, j), (i-1, j)]:
-            if neighbour[0] < 0 or neighbour[1] < 0 or neighbour[0] >= len(data) or neighbour[1] >= len(data[0]):
+        for neighbour in [(i, j + 1), (i, j - 1), (i + 1, j), (i - 1, j)]:
+            if (
+                neighbour[0] < 0
+                or neighbour[1] < 0
+                or neighbour[0] >= len(data)
+                or neighbour[1] >= len(data[0])
+            ):
                 continue
 
             neighbour_letter = data[neighbour[0]][neighbour[1]]
@@ -84,7 +88,7 @@ def part_2(is_test: bool) -> int:
     return len(result) - 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     is_test = False
     print(f"Day {DAY} result 1: {part_1(is_test)}")
     print(f"Day {DAY} result 2: {part_2(is_test)}")

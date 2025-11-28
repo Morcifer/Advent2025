@@ -1,7 +1,49 @@
 import os
+import requests
 from typing import TypeVar, Callable
 
-ResultType = TypeVar('ResultType')
+ResultType = TypeVar("ResultType")
+
+
+YEAR = 2022
+
+AOC_TOKEN = os.getenv("AOC_TOKEN")
+
+if AOC_TOKEN is None:
+    raise ValueError("You need to export the AOC_TOKEN environment variable")
+
+
+def get_date(
+    day: int,
+    data_folder: str,
+    is_test: bool,
+):
+    file_path = os.path.join(
+        "..",
+        data_folder,
+        "test" if is_test else "real",
+        f"day{day}.txt",
+    )
+
+    if os.path.isfile(file_path):
+        with open(file_path) as f:
+            content = f.readlines()
+
+        return content
+
+    # Download from AoC website, but only for the real data.
+    if is_test:
+        open(file_path, "x")
+        raise AssertionError("Test data has not been put inside the file!")
+
+    url = f"https://adventofcode.com/{YEAR}/day/12/input"
+    response = requests.get(url, headers={"Cookie": AOC_TOKEN}, timeout=5)
+    content = response.content.decode("utf-8")
+
+    with open(file_path, "w") as f:
+        f.write(response.content.decode("utf-8"))
+
+    return content
 
 
 def load_data(
@@ -12,14 +54,7 @@ def load_data(
     do_not_strip: bool = False,
     cluster_at_empty_line: bool = False,
 ) -> list[ResultType]:
-    # TODO: If file isn't there, go online.
-    file_name = (
-        os.path.join("..", data_folder, "test", f"day{day}_data.txt") if is_test
-        else os.path.join("..", data_folder, "real", f"day{day}_data.txt")
-    )
-
-    with open(file_name) as f:
-        content = f.readlines()
+    content = get_date(day, data_folder, is_test)
 
     content = [x.replace("\n", "") if do_not_strip else x.strip() for x in content]
 
@@ -27,7 +62,7 @@ def load_data(
     cluster = []
 
     for line_number, line in enumerate(content):
-        s = line if do_not_strip else line.split(' ')
+        s = line if do_not_strip else line.split(" ")
         if not cluster_at_empty_line:
             parsed_data.append(parser(s))
             continue
@@ -45,14 +80,7 @@ def load_data_un_parsed(
     day: int,
     data_folder: str,
     is_test: bool,
-    suffix: str = "",
 ) -> list[ResultType]:
-    file_name = (
-        os.path.join("..", data_folder, "test", f"day{day}_data{suffix}.txt") if is_test
-        else os.path.join("..", data_folder, "real", f"day{day}_data{suffix}.txt")
-    )
-
-    with open(file_name) as f:
-        content = f.readlines()
+    content = get_date(day, data_folder, is_test)
 
     return [x for x in content]
