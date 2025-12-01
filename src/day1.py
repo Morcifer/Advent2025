@@ -1,6 +1,10 @@
+import logging
 import math
 
 from src.utilities import load_data
+
+logger = logging.getLogger(__name__)
+
 
 DAY = 1
 
@@ -85,7 +89,16 @@ def do_magic(data: list[ParsedType], collect_200_dollars: bool) -> int:
         current = mod_current
         result += extra_0s
 
-        # print(f"Rotation {(c, i)} got from {previous} to {current} with {extra_0s} extra zeros")
+        logger.info(
+            "Rotation (%(c)s, %(i)s) got from %(previous)s to %(current)s with %(extra_0s)s extra zeros",
+            {
+                "c": c,
+                "i": i,
+                "previous": previous,
+                "current": current,
+                "extra_0s": extra_0s,
+            },
+        )
 
     # visualize(current, f"Ending at {current}, total {result}")
 

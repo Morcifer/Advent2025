@@ -1,4 +1,9 @@
+import logging
+
 from src.utilities import load_data
+
+logger = logging.getLogger(__name__)
+
 
 DAY = 0
 

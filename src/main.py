@@ -1,4 +1,14 @@
+import logging
+import sys
+
 from src.day1 import part_1, part_2
+
+
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.INFO,
+    format="%(asctime)s: %(message)s",
+)
 
 
 def part(part_number: int, is_test: bool) -> int:
