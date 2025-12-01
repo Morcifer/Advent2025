@@ -4,8 +4,10 @@ from src.utilities import load_data
 
 DAY = 1
 
+ParsedType = tuple[chr, int]
 
-def parser(s: list[str]) -> tuple[chr, int]:
+
+def parser(s: list[str]) -> ParsedType:
     value = s[0]
     return value[0], int(value[1:])
 
@@ -51,12 +53,12 @@ def visualize(current: int, title: str) -> None:
         print("".join(row))
 
 
-def do_magic(data: list[tuple[chr, int]], collect_200_dollars: bool) -> int:
+def do_magic(data: list[ParsedType], collect_200_dollars: bool) -> int:
     result = 0
     current = 50
 
     for c, i in data:
-        visualize(current, f"from {current}, going {c} for {i} clicks, total {result}")
+        # visualize(current, f"from {current}, going {c} for {i} clicks, total {result}")
 
         previous = current
         extra_0s = 0
@@ -85,7 +87,7 @@ def do_magic(data: list[tuple[chr, int]], collect_200_dollars: bool) -> int:
 
         # print(f"Rotation {(c, i)} got from {previous} to {current} with {extra_0s} extra zeros")
 
-    visualize(current, f"Ending at {current}, total {result}")
+    # visualize(current, f"Ending at {current}, total {result}")
 
     return result
 
@@ -98,14 +100,3 @@ def part_1(is_test: bool) -> int:
 def part_2(is_test: bool) -> int:
     data = load_data(DAY, parser, "data", is_test=is_test)
     return do_magic(data, collect_200_dollars=True)
-
-
-def part(part_number: int, is_test: bool) -> int:
-    method = part_1 if part_number == 1 else part_2
-    return method(is_test)
-
-
-if __name__ == "__main__":
-    TEST = True
-    print(f"Day {DAY} result 1: {part(1, TEST)}")
-    print(f"Day {DAY} result 2: {part(2, TEST)}")
