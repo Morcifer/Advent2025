@@ -63,11 +63,11 @@ def do_magic(data: list[ParsedType], collect_200_dollars: bool) -> int:
         previous = current
         extra_0s = 0
 
-        while i > 100:
-            i -= 100
+        rounds = int(i / 100)
+        i -= rounds * 100
 
-            if collect_200_dollars:
-                extra_0s += 1
+        if collect_200_dollars:
+            extra_0s += rounds
 
         match c:
             case "R":
