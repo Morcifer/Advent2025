@@ -1,11 +1,4 @@
 [project]
-name = "planning-engine"
-description = "Library for solving route planning problem"
-authors = [{name = "Coolblue"}]
-dynamic = ["version"]
-readme = "README.md"
-dependencies = [
-]
 requires-python = "==3.13.9"
 
 [project.urls]
