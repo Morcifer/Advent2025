@@ -1,0 +1,35 @@
+[project]
+name = "planning-engine"
+description = "Library for solving route planning problem"
+authors = [{name = "Coolblue"}]
+dynamic = ["version"]
+readme = "README.md"
+dependencies = [
+]
+requires-python = "==3.13.9"
+
+[project.urls]
+Repository = "https://github.com/Morcifer/Advent2025"
+
+[tool.black]
+line-length = 120
+target-version = ["py313"]
+
+[tool.pylint.messages_control]
+max-line-length = 120
+
+disable = [
+  "consider-using-in",
+  "fixme",
+  "missing-docstring",
+  "no-member",
+  "raise-missing-from",
+  "too-few-public-methods",
+  "too-many-arguments",
+  "too-many-positional-arguments",
+  "too-many-instance-attributes",
+  "too-many-locals",
+  "too-many-statements",
+  "duplicate-code",
+  "use-implicit-booleaness-not-comparison",
+]
