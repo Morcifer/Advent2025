@@ -19,35 +19,21 @@ def parser(s: list[str]) -> list[ParsedType]:
     # fmt: on
 
 
-def invalid_ids_doubles(start, end) -> list[int]:
-    result = []
-
-    for _id in range(start, end + 1):
-        string_id = str(_id)
-        length = len(string_id) // 2
-        pattern = string_id[0:length]
-        times = 2
-
-        if pattern * times == string_id:
-            result.append(_id)
-
-    return result
-
-
-def invalid_ids_all(start, end) -> list[int]:
+def invalid_ids(start: int, end: int, max_repeats: int | None) -> list[int]:
     result = []
 
     for _id in range(start, end + 1):
         string_id = str(_id)
 
-        for length in range(1, len(string_id) // 2 + 1):
-            pattern = string_id[0:length]
-            times = len(string_id) // length
+        for repeats in range(2, (max_repeats or len(string_id)) + 1):
+            length = len(string_id) // repeats
 
-            if times * len(pattern) != len(string_id):
+            if repeats * length != len(string_id):
                 continue
 
-            if pattern * times == string_id:
+            pattern = string_id[0:length]
+
+            if pattern * repeats == string_id:
                 result.append(_id)
                 break
 
@@ -56,9 +42,9 @@ def invalid_ids_all(start, end) -> list[int]:
 
 def part_1(is_test: bool) -> int:
     data = load_data(DAY, parser, "data", is_test=is_test)[0]
-    return sum(flatten([invalid_ids_doubles(*t) for t in data]))
+    return sum(flatten([invalid_ids(*t, 2) for t in data]))
 
 
 def part_2(is_test: bool) -> int:
     data = load_data(DAY, parser, "data", is_test=is_test)[0]
-    return sum(flatten([invalid_ids_all(*t) for t in data]))
+    return sum(flatten([invalid_ids(*t, None) for t in data]))
