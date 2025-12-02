@@ -1,4 +1,5 @@
 import logging
+import math
 
 from src.utilities import load_data, flatten
 
@@ -17,6 +18,28 @@ def parser(s: list[str]) -> list[ParsedType]:
         in [r.split("-") for r in s[0].split(",")]
     ]
     # fmt: on
+
+
+def integer_based_invalid_ids(start: int, end: int, max_repeats: int | None) -> list[int]:
+    result = []
+
+    for _id in range(start, end + 1):
+        id_length = math.floor(math.log10(_id)) + 1
+
+        for repeats in range(2, (max_repeats or id_length) + 1):
+            pattern_length = id_length // repeats
+
+            if repeats * pattern_length != id_length:
+                continue
+
+            pattern = _id % (10**pattern_length)
+            repeated_pattern = sum((pattern * (10 ** (repeat * pattern_length)) for repeat in range(repeats)))
+
+            if repeated_pattern == _id:
+                result.append(_id)
+                break
+
+    return result
 
 
 def invalid_ids(start: int, end: int, max_repeats: int | None) -> list[int]:
@@ -42,9 +65,9 @@ def invalid_ids(start: int, end: int, max_repeats: int | None) -> list[int]:
 
 def part_1(is_test: bool) -> int:
     data = load_data(DAY, parser, "data", is_test=is_test)[0]
-    return sum(flatten([invalid_ids(*t, 2) for t in data]))
+    return sum(flatten([invalid_ids(*t, max_repeats=2) for t in data]))
 
 
 def part_2(is_test: bool) -> int:
     data = load_data(DAY, parser, "data", is_test=is_test)[0]
-    return sum(flatten([invalid_ids(*t, None) for t in data]))
+    return sum(flatten([invalid_ids(*t, max_repeats=None) for t in data]))
