@@ -1,4 +1,5 @@
 import os
+from itertools import chain
 from typing import TypeVar, Callable
 
 import requests
@@ -88,3 +89,7 @@ def load_data_un_parsed(
     content = get_data(day, data_folder, is_test)
 
     list(content)
+
+
+def flatten(sequence):
+    return list(chain(*sequence))
