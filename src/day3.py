@@ -10,13 +10,8 @@ DAY = 3
 ParsedType = list[int]
 
 
-# TODO: Why is the input a list of strings and not just a string, again?
 def parser(s: list[str]) -> ParsedType:
     return [int(c) for c in s[0]]
-
-
-def do_magic(data: list[ParsedType]) -> int:  # pylint: disable=unused-argument
-    return -1
 
 
 def calculate_joltage(datum: ParsedType) -> int:
