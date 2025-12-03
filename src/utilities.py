@@ -12,9 +12,6 @@ YEAR = 2025
 
 AOC_TOKEN = os.getenv("AOC_TOKEN")
 
-if AOC_TOKEN is None:
-    raise ValueError("You need to export the AOC_TOKEN environment variable")
-
 
 def get_data(
     day: int,
@@ -38,6 +35,9 @@ def get_data(
     if is_test:
         with open(file_path, "x", encoding="utf-8"):
             raise AssertionError("Test data has not been put inside the file!")
+
+    if AOC_TOKEN is None:
+        raise ValueError("You need to export the AOC_TOKEN environment variable")
 
     url = f"https://adventofcode.com/{YEAR}/day/{day}/input"
     response = requests.get(url, headers={"Cookie": AOC_TOKEN}, timeout=5)
