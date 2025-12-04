@@ -7,11 +7,11 @@ logger = logging.getLogger(__name__)
 
 DAY = 4
 
-ParsedType = str
+ParsedType = list[chr]
 
 
 def parser(s: list[str]) -> ParsedType:
-    return s[0]
+    return list(s[0])
 
 
 neighbour_deltas = [
@@ -34,7 +34,7 @@ def do_magic(data: list[ParsedType]) -> int:  # pylint: disable=unused-argument
 
     for row in range(height):
         for column in range(width):
-            if data[row][column] != '@':
+            if data[row][column] != "@":
                 continue
 
             adjacent = 0
@@ -45,11 +45,14 @@ def do_magic(data: list[ParsedType]) -> int:  # pylint: disable=unused-argument
                 if neighbour_row < 0 or neighbour_row >= height or neighbour_column < 0 or neighbour_column >= width:
                     continue
 
-                if data[neighbour_row][neighbour_column] == '@':
+                if data[neighbour_row][neighbour_column] == "@":
                     adjacent += 1
 
             if adjacent < 4:
                 accessible.append((row, column))
+
+    for roll in accessible:
+        data[roll[0]][roll[1]] = "."
 
     return len(accessible)
 
@@ -61,4 +64,15 @@ def part_1(is_test: bool) -> int:
 
 def part_2(is_test: bool) -> int:
     data = load_data(DAY, parser, "data", is_test=is_test)
-    return do_magic(data)
+
+    result = 0
+
+    removed = do_magic(data)
+    result += removed
+
+    while removed != 0:
+        logger.info("Still removing, result is %(result)s", {"result": result})
+        removed = do_magic(data)
+        result += removed
+
+    return result
