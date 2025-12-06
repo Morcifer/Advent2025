@@ -53,7 +53,7 @@ def get_data(
 
 def load_data(
     day: int,
-    parser: Callable[[list[str]], ResultTypeT] | Callable[[list[list[str]]], ResultTypeT],
+    parser: Callable[[list[str]], ResultTypeT] | Callable[[list[list[str]]], ResultTypeT] | None,
     data_folder: str,
     is_test: bool,
     strip: bool = True,
@@ -62,6 +62,9 @@ def load_data(
     content = get_data(day, data_folder, is_test)
 
     content = [x.strip() if strip else x.replace("\n", "") for x in content]
+
+    if parser is None:
+        return content
 
     parsed_data = []
     cluster = []
