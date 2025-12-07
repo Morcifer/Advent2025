@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from src.day6 import part_1, part_2
+from src.day7 import part_1, part_2
 
 
 logging.basicConfig(
@@ -17,7 +17,7 @@ def part(part_number: int, is_test: bool) -> int:
 
 
 if __name__ == "__main__":
-    day = 6  # pylint: disable=invalid-name
+    day = 7  # pylint: disable=invalid-name
 
     print(f"Day {day} result 1 test: {part(1, is_test=True)}")
     print(f"Day {day} result 1 real: {part(1, is_test=False)}")
