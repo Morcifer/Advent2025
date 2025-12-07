@@ -16,8 +16,16 @@ def parser(s: list[str]) -> ParsedType:
 
 
 def print_tachyon_manifold(manifold: list[ParsedType], beam_columns_and_timelines_per_row: list[dict[int, int]]):
+    for row_index, beam_columns_and_timelines in enumerate(beam_columns_and_timelines_per_row):
+        if row_index == 0:
+            # Don't override the S.
+            continue
+
+        for column_index, _timelines in beam_columns_and_timelines.items():
+            manifold[row_index][column_index] = "|"
+
     for row in manifold:
-        print(''.join(row))
+        print("".join(row))
 
 
 def do_magic(data: list[ParsedType]) -> tuple[int, int]:  # pylint: disable=unused-argument
@@ -32,7 +40,7 @@ def do_magic(data: list[ParsedType]) -> tuple[int, int]:  # pylint: disable=unus
         relevant_row_dictionary = defaultdict(int)
         beam_columns_and_timelines_per_row.append(relevant_row_dictionary)
 
-        for (beam_column, timelines) in beam_columns_and_timelines_per_row[row_index - 1].items():
+        for beam_column, timelines in beam_columns_and_timelines_per_row[row_index - 1].items():
             if row[beam_column] == "^":
                 splits += 1
                 relevant_row_dictionary[beam_column - 1] += timelines
@@ -40,12 +48,13 @@ def do_magic(data: list[ParsedType]) -> tuple[int, int]:  # pylint: disable=unus
             else:
                 relevant_row_dictionary[beam_column] += timelines
 
+        # print_tachyon_manifold(data, beam_columns_and_timelines_per_row)
+
     return splits, sum(beam_columns_and_timelines_per_row[-1].values())
 
 
 def part_1(is_test: bool) -> int:
     data = load_data(DAY, parser, "data", is_test=is_test)
-    # print_tachyon_manifold(data, [])
     return do_magic(data)[0]
 
 
