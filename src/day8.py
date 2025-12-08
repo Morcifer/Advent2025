@@ -22,6 +22,7 @@ def euclidean_distance(node_1: ParsedType, node_2: ParsedType) -> float:
     dz = node_1[2] - node_2[2]
     return math.sqrt(dx * dx + dy * dy + dz * dz)
 
+
 class Forest:
     def __init__(self, data: list[ParsedType]):
         self.nodes = {i: node for i, node in enumerate(data)}
@@ -38,13 +39,16 @@ class Forest:
         self.distances_by_length = [node_tuple for node_tuple in sorted(self.distances.items(), key=lambda kvp: kvp[1])]
 
 
-
 def do_magic(data: list[ParsedType], connections: int) -> int:  # pylint: disable=unused-argument
     forest = Forest(data)
     sets = [{n} for n in forest.nodes.keys()]
 
-    for connection in range(connections):
-        shortest_tuple = forest.distances_by_length[connection*2][0]
+    connection = 1
+
+    while connection < connections:
+        connection += 1
+
+        shortest_tuple = forest.distances_by_length[connection * 2][0]
 
         # Find sets the two belong two
         set_1 = set()
@@ -66,6 +70,10 @@ def do_magic(data: list[ParsedType], connections: int) -> int:  # pylint: disabl
         sets.append(new_set)
 
         # print(f"Removed {set_1} and {set_2} to make {new_set}")
+        if len(sets) == 1:
+            box_1 = forest.nodes[shortest_tuple[0]]
+            box_2 = forest.nodes[shortest_tuple[1]]
+            return box_1[0] * box_2[0]
 
     longest_set_sizes = sorted([len(s) for s in sets])
 
@@ -79,4 +87,4 @@ def part_1(is_test: bool) -> int:
 
 def part_2(is_test: bool) -> int:
     data = load_data(DAY, parser, "data", is_test=is_test)
-    return do_magic(data, 10 if is_test else 1000)
+    return do_magic(data, float("inf"))
