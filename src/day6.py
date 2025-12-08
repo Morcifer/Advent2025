@@ -27,13 +27,14 @@ def do_magic(data: list[ParsedType]) -> int:  # pylint: disable=unused-argument
     for column in range(len(data[0])):
         match data[-1][column]:
             case "+":
-                result += sum([x[column] for x in data[:-1]])
+                result += sum(x[column] for x in data[:-1])
             case "*":
                 result += math.prod([x[column] for x in data[:-1]])
 
     return result
 
 
+# TODO: Change part 1 and part 2 so that they can use the same logic after transposing the data.
 def do_nasty_magic(data: list[str]) -> int:
     result = 0
 
@@ -42,10 +43,9 @@ def do_nasty_magic(data: list[str]) -> int:
 
     operator_locations = [column for column in range(len(operators_row)) if operators_row[column] != " "]
 
-    for operator_index in range(len(operator_locations)):
+    for operator_index, start_column in enumerate(operator_locations):
         numbers_to_operate = []
 
-        start_column = operator_locations[operator_index]
         end_column = (
             operator_locations[operator_index + 1] - 1
             if operator_index < len(operator_locations) - 1
@@ -56,7 +56,7 @@ def do_nasty_magic(data: list[str]) -> int:
             number_string = [number_row[column] for number_row in number_rows if len(number_row) > column]
             numbers_to_operate.append(int("".join(number_string)))
 
-        match operators_row[operator_locations[operator_index]]:
+        match operators_row[start_column]:
             case "+":
                 result += sum(numbers_to_operate)
             case "*":

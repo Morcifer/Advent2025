@@ -25,18 +25,17 @@ def euclidean_distance(node_1: ParsedType, node_2: ParsedType) -> float:
 
 class Forest:
     def __init__(self, data: list[ParsedType]):
-        self.nodes = {i: node for i, node in enumerate(data)}
-        self.distances = dict()
+        self.nodes = dict(enumerate(data))
+        self.distances = {}
 
         for node_1_id, node_1 in enumerate(data):
             for node_2_id, node_2 in enumerate(data):
-                # TODO: Consider only having one entry per pair, depends on part 2
-                if node_1_id == node_2_id:
+                if node_1_id >= node_2_id:
                     continue
 
                 self.distances[(node_1_id, node_2_id)] = euclidean_distance(node_1, node_2)
 
-        self.distances_by_length = [node_tuple for node_tuple in sorted(self.distances.items(), key=lambda kvp: kvp[1])]
+        self.pairs_by_distance = [pair for pair, _ in sorted(self.distances.items(), key=lambda kvp: kvp[1])]
 
 
 def do_magic(data: list[ParsedType], connections: int) -> int:  # pylint: disable=unused-argument
@@ -48,31 +47,37 @@ def do_magic(data: list[ParsedType], connections: int) -> int:  # pylint: disabl
     while connection < connections:
         connection += 1
 
-        shortest_tuple = forest.distances_by_length[connection * 2][0]
+        closest_tuple = forest.pairs_by_distance[connection]
 
-        # Find sets the two belong two
+        # Find sets the two elements of the tuple belong to
         set_1 = set()
         set_2 = set()
 
         for s in sets:
-            if shortest_tuple[0] in s:
+            if closest_tuple[0] in s:
                 set_1 = s
-            if shortest_tuple[1] in s:
+            if closest_tuple[1] in s:
                 set_2 = s
 
+        # If they're the same set, we don't do anything
         if set_1 == set_2:
             continue
 
+        # If they're different sets, congratulations, they're now the same set.
         new_set = set_1.union(set_2)
 
         sets.remove(set_1)
         sets.remove(set_2)
         sets.append(new_set)
 
-        # print(f"Removed {set_1} and {set_2} to make {new_set}")
+        logger.info(
+            "Removed %(set_1)s and %(set_2)s to make %(new_set)s",
+            {"set_1": set_1, "set_2": set_2, "new_set": new_set},
+        )
+
         if len(sets) == 1:
-            box_1 = forest.nodes[shortest_tuple[0]]
-            box_2 = forest.nodes[shortest_tuple[1]]
+            box_1 = forest.nodes[closest_tuple[0]]
+            box_2 = forest.nodes[closest_tuple[1]]
             return box_1[0] * box_2[0]
 
     longest_set_sizes = sorted([len(s) for s in sets])
