@@ -96,3 +96,7 @@ def load_data_un_parsed(
 
 def flatten(sequence):
     return list(chain(*sequence))
+
+
+def chain2(sequence):
+    return list(zip(sequence[:-1], sequence[1:]))
