@@ -1,6 +1,7 @@
 import logging
+from itertools import pairwise
 
-from src.utilities import load_data, chain2
+from src.utilities import load_data
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +51,7 @@ def do_other_magic(data: list[ParsedType]) -> int:
     tiles = [["."] * len(xs) for _ in range(len(ys))]
 
     # Do green edges, including closing the shape
-    for tile_1, tile_2 in chain2(data + data[0:1]):
+    for tile_1, tile_2 in pairwise(data + data[0:1]):
         # TODO: clean this if-else, it's ugly
         if tile_1[1] == tile_2[1]:  # y is the same, iterate over x
             start = min(tile_1[0], tile_2[0])
@@ -84,6 +85,7 @@ def do_other_magic(data: list[ParsedType]) -> int:
     max_size = 0
     for tile_1 in data:
         for tile_2 in data:
+            # TODO: skip other half.
             height = abs(tile_1[0] - tile_2[0]) + 1
             width = abs(tile_1[1] - tile_2[1]) + 1
 
@@ -109,6 +111,12 @@ def do_other_magic(data: list[ParsedType]) -> int:
                 max_size = max(max_size, height * width)
 
     return max_size
+
+
+def do_other_magic_faster(data: list[ParsedType]) -> int:
+    # TODO: Just check if there are any edges inside the rectangle,
+    #  no need for all this hubbub
+    return 0
 
 
 def do_cheating_magic(data: list[ParsedType]) -> int:
