@@ -39,6 +39,7 @@ class Forest:
 
 
 def do_magic(data: list[ParsedType], connections: int) -> int:  # pylint: disable=unused-argument
+    # TODO: Try to use a Disjoint-set data structure to speed this up.
     forest = Forest(data)
     sets = [{n} for n in forest.nodes.keys()]
 
