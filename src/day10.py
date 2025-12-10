@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 DAY = 10
 
-ParsedType = tuple[list[chr], list[list[int]], list[int]]
+ParsedType = tuple[list[chr], list[set[int]], list[int]]
 
 
 def parser(s: list[str]) -> ParsedType:
@@ -21,7 +21,7 @@ def parser(s: list[str]) -> ParsedType:
     joltages = [int(x) for x in s[-1][1:-1].split(",")]
 
     for substring in s[1:-1]:
-        buttons.append([int(x) for x in substring[1:-1].split(",")])
+        buttons.append({int(x) for x in substring[1:-1].split(",")})
 
     return lights, buttons, joltages
 
@@ -75,10 +75,14 @@ def do_linear_algebra_magic(data: list[ParsedType], part: int) -> int:
             [[1 if location in button_list else 0 for location in range(len(joltages))] for button_list in buttons]
         ).transpose()
 
+        # TODO: For this to work in part 1, we need to somehow introduce a modulo here, so allowing the target to have
+        #  + [2, 2, 2, 2] - meaning having len(lights) extra parameters, but possibly no extra constraints.
+        # TODO: Alternatively, or maybe in addition, try to avoid using the milp solver, even if it means implementing
+        #  your own branch-and-bound solver.
         target = (
-            np.array(joltages)
-            if part == 2
-            else np.array([0 if lights[location] == "." else 1 for location in range(len(lights))])
+            np.array([0 if lights[location] == "." else 1 for location in range(len(lights))])
+            if part == 1
+            else np.array(joltages)
         )
 
         solution = opt.milp(
