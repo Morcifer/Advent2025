@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from src.day9 import part_1, part_2, DAY
+from src.day10 import part_1, part_2, DAY
 
 
 logging.basicConfig(
@@ -20,5 +20,5 @@ if __name__ == "__main__":
     print(f"Day {DAY} result 1 test: {part(1, is_test=True)}")
     print(f"Day {DAY} result 1 real: {part(1, is_test=False)}")
 
-    print(f"Day {DAY} result 2 test: {part(2, is_test=True)}")
-    print(f"Day {DAY} result 2 real: {part(2, is_test=False)}")
+    # print(f"Day {DAY} result 2 test: {part(2, is_test=True)}")
+    # print(f"Day {DAY} result 2 real: {part(2, is_test=False)}")
