@@ -1,4 +1,8 @@
 import logging
+import math
+
+import numpy as np
+import scipy.optimize as opt
 
 from src.utilities import load_data
 
@@ -7,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 DAY = 10
 
-ParsedType = tuple[list[chr], list[tuple], list[int]]
+ParsedType = tuple[list[chr], list[list[int]], list[int]]
 
 
 def parser(s: list[str]) -> ParsedType:
@@ -17,7 +21,7 @@ def parser(s: list[str]) -> ParsedType:
     joltages = [int(x) for x in s[-1][1:-1].split(",")]
 
     for substring in s[1:-1]:
-        buttons.append(tuple([int(x) for x in substring[1:-1].split(",")]))
+        buttons.append([int(x) for x in substring[1:-1].split(",")])
 
     return lights, buttons, joltages
 
@@ -27,21 +31,12 @@ def do_magic(data: list[ParsedType]) -> int:  # pylint: disable=unused-argument
 
     for lights, buttons, _ in data:
         # BFS your way to christmas.
-        '''
-         1  procedure BFS(G, root) is
-         2      let Q be a queue
-         3      label root as explored
-         4      Q.enqueue(root)
-        '''
         # This algorithm assumes nothing needs to end completely off. Let's make sure.
         assert lights != ["."] * len(lights)
 
         explored = set()
 
-        queue = [
-            (["."] * len(lights), button, 0)
-            for button in range(len(buttons))
-        ]
+        queue = [(["."] * len(lights), button, 0) for button in range(len(buttons))]
 
         while len(queue) > 0:
             to_explore_current_lights, to_explore_button_to_press, pressed_buttons = queue.pop(0)
@@ -67,52 +62,33 @@ def do_magic(data: list[ParsedType]) -> int:  # pylint: disable=unused-argument
     return result
 
 
-def do_other_magic(data: list[ParsedType]) -> int:
+def do_linear_algebra_magic(data: list[ParsedType], part: int) -> int:
     result = 0
 
-    for index, (_, buttons, joltages) in enumerate(data):
+    for index, (lights, buttons, joltages) in enumerate(data):
         logger.info(
-            "Handling row %(index)s out of %(total)s, total result is currently %(result)s",
-            {"index": index, "total": len(data), "result": result},
+            "Handling row %(index)s out of %(total)s (joltages: %(joltages)s, total result is currently %(result)s",
+            {"index": index, "total": len(data), "joltages": joltages, "result": result},
         )
 
-        # BFS your way to christmas.
-        '''
-         1  procedure BFS(G, root) is
-         2      let Q be a queue
-         3      label root as explored
-         4      Q.enqueue(root)
-        '''
-        # This algorithm assumes nothing needs to end completely off. Let's make sure.
-        assert joltages != [0] * len(joltages)
+        matrix = np.array(
+            [[1 if location in button_list else 0 for location in range(len(joltages))] for button_list in buttons]
+        ).transpose()
 
-        explored = set()
+        target = (
+            np.array(joltages)
+            if part == 2
+            else np.array([0 if lights[location] == "." else 1 for location in range(len(lights))])
+        )
 
-        queue = [
-            ([0] * len(joltages), button, 0)
-            for button in range(len(buttons))
-        ]
+        solution = opt.milp(
+            c=np.ones(len(buttons)),
+            bounds=opt.Bounds(lb=0, ub=1 if part == 1 else max(joltages)),
+            constraints=opt.LinearConstraint(matrix, lb=target, ub=target),
+            integrality=np.ones(len(buttons)),
+        )
 
-        while len(queue) > 0:
-            to_explore_current_joltages, to_explore_button_to_press, pressed_buttons = queue.pop(0)
-
-            for button in buttons[to_explore_button_to_press]:
-                to_explore_current_joltages[button] += 1
-
-            if to_explore_current_joltages == joltages:
-                result += pressed_buttons + 1
-                break
-
-            if all((current > target for current, target in zip(to_explore_current_joltages, joltages))):
-                break
-
-            if str(to_explore_current_joltages) in explored:
-                continue
-
-            explored.add(str(to_explore_current_joltages))
-
-            for button in range(len(buttons)):
-                queue.append((to_explore_current_joltages[:], button, pressed_buttons + 1))
+        result += math.ceil(solution.fun)
 
     return result
 
@@ -124,4 +100,4 @@ def part_1(is_test: bool) -> int:
 
 def part_2(is_test: bool) -> int:
     data = load_data(DAY, parser, "data", is_test=is_test)
-    return do_other_magic(data)
+    return do_linear_algebra_magic(data, 2)
