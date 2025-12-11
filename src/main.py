@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from src.day10 import part_1, part_2, DAY
+from src.day11 import part_1, part_2, DAY
 
 
 logging.basicConfig(
