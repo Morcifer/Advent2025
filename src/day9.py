@@ -44,6 +44,7 @@ def flood_fill(tiles: list[list[chr]], start: tuple[int, int]):
             queue.append((new_x, new_y))
 
 
+# pylint: disable=too-many-branches
 def do_other_magic(data: list[ParsedType]) -> int:
     xs = {x: i for i, x in enumerate(sorted({datum[0] for datum in data}))}
     ys = {y: i for i, y in enumerate(sorted({datum[1] for datum in data}))}
@@ -81,7 +82,7 @@ def do_other_magic(data: list[ParsedType]) -> int:
     # Now do greedy
     max_size = 0
     for tile_1_index, tile_1 in enumerate(data):
-        for tile_2 in data[tile_1_index+1:]:
+        for tile_2 in data[tile_1_index + 1 :]:
             height = abs(tile_1[0] - tile_2[0]) + 1
             width = abs(tile_1[1] - tile_2[1]) + 1
 
@@ -112,7 +113,7 @@ def do_other_magic_more_simply(data: list[ParsedType]) -> int:
     # However, this method isn't actually much faster, though I don't completely understand why.
     max_size = 0
     for tile_1_index, tile_1 in enumerate(data):
-        for tile_2 in data[tile_1_index+1:]:
+        for tile_2 in data[tile_1_index + 1 :]:
             min_x, max_x = sorted((tile_1[0], tile_2[0]))
             min_y, max_y = sorted((tile_1[1], tile_2[1]))
 
@@ -137,6 +138,7 @@ def do_other_magic_more_simply(data: list[ParsedType]) -> int:
     return max_size
 
 
+# pylint: disable=import-outside-toplevel
 def do_cheating_magic(data: list[ParsedType]) -> int:
     from shapely.geometry import Polygon
 
@@ -144,7 +146,7 @@ def do_cheating_magic(data: list[ParsedType]) -> int:
 
     max_size = 0
     for tile_1_index, tile_1 in enumerate(data):
-        for tile_2 in data[tile_1_index+1:]:
+        for tile_2 in data[tile_1_index + 1 :]:
             polyb = Polygon([tile_1, (tile_2[0], tile_1[1]), tile_2, (tile_1[0], tile_2[1])])
 
             height = abs(tile_1[0] - tile_2[0]) + 1
