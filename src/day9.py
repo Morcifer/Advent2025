@@ -52,17 +52,14 @@ def do_other_magic(data: list[ParsedType]) -> int:
 
     # Do green edges, including closing the shape
     for tile_1, tile_2 in pairwise(data + data[0:1]):
-        # TODO: clean this if-else, it's ugly
         if tile_1[1] == tile_2[1]:  # y is the same, iterate over x
-            start = min(tile_1[0], tile_2[0])
-            end = max(tile_1[0], tile_2[0])
+            start, end = sorted((tile_1[0], tile_2[0]))
 
             for x in range(start, end + 1):
                 if x in xs:
                     tiles[ys[tile_1[1]]][xs[x]] = "X"
         else:  # x is the same, iterate over y
-            start = min(tile_1[1], tile_2[1])
-            end = max(tile_1[1], tile_2[1])
+            start, end = sorted((tile_1[1], tile_2[1]))
 
             for y in range(start, end + 1):
                 if y in ys:
@@ -83,9 +80,8 @@ def do_other_magic(data: list[ParsedType]) -> int:
 
     # Now do greedy
     max_size = 0
-    for tile_1 in data:
-        for tile_2 in data:
-            # TODO: skip other half.
+    for tile_1_index, tile_1 in enumerate(data):
+        for tile_2 in data[tile_1_index+1:]:
             height = abs(tile_1[0] - tile_2[0]) + 1
             width = abs(tile_1[1] - tile_2[1]) + 1
 
@@ -95,11 +91,8 @@ def do_other_magic(data: list[ParsedType]) -> int:
             tile_2_condensed_x = xs[tile_2[0]]
             tile_2_condensed_y = ys[tile_2[1]]
 
-            x_start = min(tile_1_condensed_x, tile_2_condensed_x)
-            y_start = min(tile_1_condensed_y, tile_2_condensed_y)
-
-            x_end = max(tile_1_condensed_x, tile_2_condensed_x)
-            y_end = max(tile_1_condensed_y, tile_2_condensed_y)
+            x_start, x_end = sorted((tile_1_condensed_x, tile_2_condensed_x))
+            y_start, y_end = sorted((tile_1_condensed_y, tile_2_condensed_y))
 
             is_valid = True
 
@@ -113,10 +106,35 @@ def do_other_magic(data: list[ParsedType]) -> int:
     return max_size
 
 
-def do_other_magic_faster(data: list[ParsedType]) -> int:
-    # TODO: Just check if there are any edges inside the rectangle,
-    #  no need for all this hubbub
-    return 0
+def do_other_magic_more_simply(data: list[ParsedType]) -> int:
+    # It's enough to check that there's no tile inside the shape (other than the ones currently checked).
+    #  no need for the fancy floodfill hubbub.
+    # However, this method isn't actually much faster, though I don't completely understand why.
+    max_size = 0
+    for tile_1_index, tile_1 in enumerate(data):
+        for tile_2 in data[tile_1_index+1:]:
+            min_x, max_x = sorted((tile_1[0], tile_2[0]))
+            min_y, max_y = sorted((tile_1[1], tile_2[1]))
+
+            rectangle_in_polygon = True
+
+            for line_start, line_end in pairwise(data + data[0:1]):
+                min_line_x, max_line_x = sorted((line_start[0], line_end[0]))
+                min_line_y, max_line_y = sorted((line_start[1], line_end[1]))
+
+                if (min_x < max_line_x and min_line_x < max_x) and (min_y < max_line_y and min_line_y < max_y):
+                    rectangle_in_polygon = False
+                    break
+
+            if not rectangle_in_polygon:
+                continue
+
+            height = (max_y - min_y) + 1
+            width = (max_x - min_x) + 1
+
+            max_size = max(max_size, height * width)
+
+    return max_size
 
 
 def do_cheating_magic(data: list[ParsedType]) -> int:
@@ -125,8 +143,8 @@ def do_cheating_magic(data: list[ParsedType]) -> int:
     polya = Polygon(data)
 
     max_size = 0
-    for tile_1 in data:
-        for tile_2 in data:
+    for tile_1_index, tile_1 in enumerate(data):
+        for tile_2 in data[tile_1_index+1:]:
             polyb = Polygon([tile_1, (tile_2[0], tile_1[1]), tile_2, (tile_1[0], tile_2[1])])
 
             height = abs(tile_1[0] - tile_2[0]) + 1
